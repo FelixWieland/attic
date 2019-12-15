@@ -1,10 +1,11 @@
+import IAttic from "./IAttic";
 import ICache from "./ICache";
 import { IAtticOptions } from "./IOptions";
 import Item, { Lifetime } from "./Item";
 import MemoryCache from "./MemoryCache";
 import PersistentCache from "./PersistentCache";
 
-class Attic {
+class Attic implements IAttic {
     public static readonly defaultOptions: IAtticOptions = {
         lifetime: null,
         memoryCache: undefined,
@@ -14,6 +15,7 @@ class Attic {
 
     public readonly options: IAtticOptions;
     public readonly name: string;
+
     private persistentCache: ICache;
     private memoryCache: ICache;
 
@@ -33,24 +35,29 @@ class Attic {
             : this.options.persistentCache;
     }
 
+    /**
+     * @param id - of the item that should be removed
+     */
     public remove = (id: string) => {
         this.memoryCache.remove(id);
         this.persistentCache.remove(id);
     }
 
+    /**
+     * @param id - of the item that should be read
+     * @returns
+     */
     public get = (id: string) => {
-        let item = this.memoryCache.retrieve(id);
-        if (item && !item.reachedEndOfLife()) {
-            return this.makeContentPromise(item);
-        }
-        item = this.persistentCache.retrieve(id);
-        if (item && !item.reachedEndOfLife()) {
-            this.memoryCache.restore(id, item);
-            return this.makeContentPromise(item);
-        }
-        return this.makeFallbackPromise(id);
+        const item = this.getFromMemory(id) || this.getFromPersistent(id);
+        return item ? this.makeContentPromise(item) : this.makeFallbackPromise(id);
     }
 
+    /**
+     * @param id - of the item that should be stored
+     * @param setter - content that should be stored.
+     *                 can be a promise, a function that returns the content/promise
+     *                 or simply the content
+     */
     public set = async (id: string, setter: any) => {
         if (setter instanceof Promise) {
             this.set(id, await setter);
@@ -61,24 +68,28 @@ class Attic {
         }
     }
 
+    private getFromMemory = (id: string) => {
+        const item = this.memoryCache.retrieve(id);
+        return !item || item.reachedEndOfLife() ? undefined : item;
+    }
+
+    private getFromPersistent = (id: string) => {
+        const item = this.persistentCache.retrieve(id);
+        return !item || item.reachedEndOfLife() ? undefined : this.memoryCache.restore(id, item);
+    }
+
     private makeContentPromise = (item: Item) => this.fallbackFactory(async () => item.get());
 
     private makeFallbackPromise = <T>(id: string) =>
         this.fallbackFactory(async (promise: Promise<T>) =>
                                 this.saveToBothCaches(id, await promise) && await promise)
 
-    private fallbackFactory = (fn: (arg0: Promise<any>) => Promise<any>) => ({
-        fallback: fn,
-    })
+    private fallbackFactory = (fallback: (arg0: Promise<any>) => Promise<any>) => ({ fallback });
 
     private saveToBothCaches(id: string, content: any) {
         this.memoryCache.set(id, content);
         const item = this.memoryCache.retrieve(id);
-        if (!item) {
-            return false;
-        }
-        this.persistentCache.restore(id, item);
-        return true;
+        return item ? !!this.persistentCache.restore(id, item) : false;
     }
 
 }

@@ -39,9 +39,11 @@ class MemoryCache extends BaseCache  {
     /**
      * @param id - of the Item
      * @param item - that should be stored
+     * @returns item that was stored
      */
     public restore = (id: string, item: Item) => {
         this.store[id] = item;
+        return item;
     }
 }
 

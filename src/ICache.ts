@@ -7,7 +7,7 @@ interface ICache {
     get(id: string): object | undefined;
     remove(id: string): void;
     retrieve(id: string): Item | undefined;
-    restore(id: string, item: Item): void;
+    restore(id: string, item: Item): Item;
 }
 
 export default ICache;

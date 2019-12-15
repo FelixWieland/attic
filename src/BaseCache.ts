@@ -48,7 +48,7 @@ abstract class BaseCache implements ICache {
     }
 
     /**
-     * @param id - of the item that should be read
+     * @param id - of the item that should be removed
      */
     public abstract remove(id: string): void;
 
@@ -61,8 +61,9 @@ abstract class BaseCache implements ICache {
     /**
      * @param id - of the Item
      * @param item - that should be stored
+     * @returns item that was stored
      */
-    public abstract restore(id: string, item: Item): void;
+    public abstract restore(id: string, item: Item): Item;
 }
 
 export default BaseCache;
