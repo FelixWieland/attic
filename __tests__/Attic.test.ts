@@ -57,3 +57,15 @@ test("can remove items", async () => {
     const dummy = await attic.get(ids.item1).fallback(fallbackProm(items.item2)).then((c: any) => c);
     expect(dummy).toBe(items.item2);
 });
+
+test("fallback extractor can be spezified", async () => {
+    const cache: Attic = new Attic("cache", {
+        fallbackExtractor: (object) => object.title,
+        lifetime: 10,
+    });
+    const item = {
+        title: "delectus aut autem",
+    };
+    const content = await cache.get("stuff").fallback(async () => item);
+    expect(content).toBe("delectus aut autem");
+});

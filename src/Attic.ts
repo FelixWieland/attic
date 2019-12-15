@@ -7,6 +7,7 @@ import PersistentCache from "./PersistentCache";
 
 class Attic implements IAttic {
     public static readonly defaultOptions: IAtticOptions = {
+        fallbackExtractor: (content: any) => content,
         lifetime: null,
         memoryCache: undefined,
         persistentCache: undefined,
@@ -20,6 +21,7 @@ class Attic implements IAttic {
 
     /**
      * Attic
+     *
      * Creates a attic cache. Attic syncs a persistent storage like localStorage with a memory storage
      * to reduce read time. Additionaly it can track the lifetime of a element and discard it if its too old.
      *
@@ -34,7 +36,7 @@ class Attic implements IAttic {
      *          persistentCache: sessionStorage
      *      }
      */
-    constructor(name: string, options: IAtticOptions) {
+    constructor(name: string, options?: IAtticOptions) {
         this.options = {
             ...Attic.defaultOptions,
             ...(options || {}),
@@ -98,7 +100,8 @@ class Attic implements IAttic {
     private makeFallbackPromise = <T>(id: string) =>
         this.fallbackFactory(async (fallbackPromise: () => Promise<T>) => {
             const content = await fallbackPromise();
-            return this.saveToBothCaches(id, content) && content;
+            const extractedContent = await this.options.fallbackExtractor!(content);
+            return this.saveToBothCaches(id, extractedContent) && extractedContent;
         })
 
     private fallbackFactory = (fallback: (fn: () => Promise<any>) => Promise<any>) => ({ fallback });

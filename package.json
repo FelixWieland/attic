@@ -1,6 +1,6 @@
 {
   "name": "@fwieland/attic",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Sophisticated caching",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "jest": "^24.9.0",
+    "jest-fetch-mock": "^2.1.2",
     "ts-jest": "^24.2.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.3"

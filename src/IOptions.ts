@@ -4,6 +4,7 @@ import { Lifetime } from "./Item";
 interface IAtticOptions extends IMemoryCacheOptions, IPersistentCacheOptions  {
     persistentCache?: ICache;
     memoryCache?: ICache;
+    fallbackExtractor?: (content: any) => any;
 }
 
 // tslint:disable-next-line: no-empty-interface
