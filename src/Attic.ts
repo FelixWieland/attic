@@ -10,7 +10,6 @@ class Attic implements IAttic {
         lifetime: null,
         memoryCache: undefined,
         persistentCache: undefined,
-        storage: localStorage,
     };
 
     public readonly options: IAtticOptions;
@@ -19,6 +18,22 @@ class Attic implements IAttic {
     private persistentCache: ICache;
     private memoryCache: ICache;
 
+    /**
+     * Attic
+     * Creates a attic cache. Attic syncs a persistent storage like localStorage with a memory storage
+     * to reduce read time. Additionaly it can track the lifetime of a element and discard it if its too old.
+     *
+     * To minimize null values you must provide a fallback (like a API-Fetch) each time you read from cache.
+     * If a item dont exists or if the lifetime of a element is over the fallback function is used and the result
+     * of that function will be stored with the id you passed in the get function.
+     *
+     * @param name - used to identify elements in a persistent storage e.g. localStorage
+     * @param options - specify lifetime and/or use your custom storage:
+     * E.g. to use sessionStorage pass in a object like:
+     *      {
+     *          persistentCache: sessionStorage
+     *      }
+     */
     constructor(name: string, options: IAtticOptions) {
         this.options = {
             ...Attic.defaultOptions,
@@ -81,12 +96,12 @@ class Attic implements IAttic {
     private makeContentPromise = (item: Item) => this.fallbackFactory(async () => item.get());
 
     private makeFallbackPromise = <T>(id: string) =>
-        this.fallbackFactory(async (promiseFn: () => Promise<T>) => {
-            const promise = promiseFn();
-            return this.saveToBothCaches(id, await promise) && await promise;
+        this.fallbackFactory(async (fallbackPromise: () => Promise<T>) => {
+            const content = await fallbackPromise();
+            return this.saveToBothCaches(id, content) && content;
         })
 
-    private fallbackFactory = (fn: any) => ({ fallback: fn });
+    private fallbackFactory = (fallback: (fn: <T>() => Promise<T>) => Promise<any>) => ({ fallback });
 
     private saveToBothCaches(id: string, content: any) {
         this.memoryCache.set(id, content);

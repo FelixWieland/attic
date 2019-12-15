@@ -1,6 +1,6 @@
 {
   "name": "@fwieland/attic",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sophisticated caching",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
