@@ -81,10 +81,12 @@ class Attic implements IAttic {
     private makeContentPromise = (item: Item) => this.fallbackFactory(async () => item.get());
 
     private makeFallbackPromise = <T>(id: string) =>
-        this.fallbackFactory(async (promise: Promise<T>) =>
-                                this.saveToBothCaches(id, await promise) && await promise)
+        this.fallbackFactory(async (promiseFn: () => Promise<T>) => {
+            const promise = promiseFn();
+            return this.saveToBothCaches(id, await promise) && await promise;
+        })
 
-    private fallbackFactory = (fallback: (arg0: Promise<any>) => Promise<any>) => ({ fallback });
+    private fallbackFactory = (fn: any) => ({ fallback: fn });
 
     private saveToBothCaches(id: string, content: any) {
         this.memoryCache.set(id, content);

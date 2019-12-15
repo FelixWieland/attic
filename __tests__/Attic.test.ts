@@ -18,7 +18,7 @@ const items = {
     item2: { b: 2 },
 };
 
-const fallbackProm = (item: object) => new Promise((resolve, _) => resolve(item));
+const fallbackProm = (item: object) => () => new Promise((resolve, _) => resolve(item));
 
 test("creation of item", () => {
     attic = new Attic(name, settings);

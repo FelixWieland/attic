@@ -1,6 +1,6 @@
 {
-  "name": "attic",
-  "version": "1.0.0",
+  "name": "@fwieland/attic",
+  "version": "1.0.1",
   "description": "Sophisticated caching",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -32,5 +32,16 @@
   },
   "dependencies": {
     "@types/chai": "^4.2.7"
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FelixWieland/attic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FelixWieland/attic/issues"
+  },
+  "homepage": "https://github.com/FelixWieland/attic#readme"
 }

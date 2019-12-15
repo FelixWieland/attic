@@ -1,6 +1,6 @@
 
 type Fallback = ({
-    fallback: (arg0: Promise<any>) => Promise<any>;
+    fallback: (arg0: () => Promise<any>) => Promise<any>;
 });
 
 interface IAttic {
