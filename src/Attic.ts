@@ -101,7 +101,7 @@ class Attic implements IAttic {
             return this.saveToBothCaches(id, content) && content;
         })
 
-    private fallbackFactory = (fallback: (fn: <T>() => Promise<T>) => Promise<any>) => ({ fallback });
+    private fallbackFactory = (fallback: (fn: () => Promise<any>) => Promise<any>) => ({ fallback });
 
     private saveToBothCaches(id: string, content: any) {
         this.memoryCache.set(id, content);

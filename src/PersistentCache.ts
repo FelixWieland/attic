@@ -37,12 +37,12 @@ class PersistentCache extends BaseCache {
      * @param id of the item
      * @returns id with cache-name as prefix
      */
-    public uniqueAccessorID = (id: string) => this.name + id;
+    public uniqueAccessorID = (id: string) => this.name + ":" + id;
 
     /**
      * @returns keys of stored items. Expensive operation!
      */
-    public keys = () => Object.keys(this.store).filter((e) => e.startsWith(this.name)).map((e) => e.replace(this.name, ""));
+    public keys = () => Object.keys(this.store).filter((e) => e.startsWith(this.name)).map((e) => e.replace(this.name + ":", ""));
 
     /**
      * @param id - of the item that should be read
