@@ -30,3 +30,15 @@ cache.get("id1")
 
 ```
 
+To reduce the boilerplate of extracting the json (in case of API-Requests) attic allows to specify a fallbackExtractor function.
+
+```js
+const cache = new Attic("storageName", {
+	fallbackExtractor: (r) => r.json(),
+})
+
+cache.get("id1")
+	.fallback(() => fetch('https://jsonplaceholder.typicode.com/todos/1'))
+	.then(content => console.log(content));
+
+```
