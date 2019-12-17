@@ -11,6 +11,7 @@ class Attic implements IAttic {
         lifetime: null,
         memoryCache: undefined,
         persistentCache: undefined,
+        syncOnInit: false,
     };
 
     public readonly options: IAtticOptions;
@@ -50,7 +51,21 @@ class Attic implements IAttic {
         this.persistentCache = this.options.persistentCache = !this.options.persistentCache
             ? new PersistentCache(this.name, options)
             : this.options.persistentCache;
+
+        if (this.options.syncOnInit) {
+            this.syncAll();
+        }
     }
+
+    /**
+     * @returns the number of items in memoryCache
+     */
+    public itemsInMemory = () => this.memoryCache.items();
+
+    /**
+     * @returns the number of items in persistentCache
+     */
+    public itemsInPersistent = () => this.persistentCache.items();
 
     /**
      * @param id - of the item that should be removed
@@ -58,6 +73,7 @@ class Attic implements IAttic {
     public remove = (id: string) => {
         this.memoryCache.remove(id);
         this.persistentCache.remove(id);
+        return undefined;
     }
 
     /**
@@ -87,12 +103,12 @@ class Attic implements IAttic {
 
     private getFromMemory = (id: string) => {
         const item = this.memoryCache.retrieve(id);
-        return !item || item.reachedEndOfLife() ? undefined : item;
+        return !item || item.reachedEndOfLife() ? this.remove(id) : item;
     }
 
     private getFromPersistent = (id: string) => {
         const item = this.persistentCache.retrieve(id);
-        return !item || item.reachedEndOfLife() ? undefined : this.memoryCache.restore(id, item);
+        return !item || item.reachedEndOfLife() ? this.remove(id) : this.memoryCache.restore(id, item);
     }
 
     private makeContentPromise = (item: Item) => this.fallbackFactory(async () => item.get());
@@ -111,6 +127,8 @@ class Attic implements IAttic {
         const item = this.memoryCache.retrieve(id);
         return item ? !!this.persistentCache.restore(id, item) : false;
     }
+
+    private syncAll = () => this.persistentCache.keys().map((id) => this.getFromPersistent(id));
 
 }
 

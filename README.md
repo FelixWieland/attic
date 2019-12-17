@@ -42,3 +42,30 @@ cache.get("id1")
 	.then(content => console.log(content));
 
 ```
+
+# Options
+
+You can provide different options to customize and extend attic:
+The provided examples are the default values of attic.
+
+```js
+const cache = new Attic("storageName", {
+
+	// spezifies the liftime of a item
+	liftime: null,
+
+	// will get called on the fallback promise
+	fallbackExtractor: (e) => e, 
+
+	// On default attic will load the spezific item into memory if it is the first time requested.
+	// If synOnInit is true attic will load all items that are stored in the persitentCache into the memoryCache.
+	syncOnInit: false, 
+
+	// memoryCache, TS-Interface: ICache
+	memoryCache: new MemoryCache(),	
+
+	//localStorage, TS-Interface: ICache
+	persistentCache: new PersistentCache(), 
+})
+
+```

@@ -5,6 +5,7 @@ interface IAtticOptions extends IMemoryCacheOptions, IPersistentCacheOptions  {
     persistentCache?: ICache;
     memoryCache?: ICache;
     fallbackExtractor?: (content: any) => any;
+    syncOnInit?: boolean;
 }
 
 // tslint:disable-next-line: no-empty-interface

@@ -69,3 +69,18 @@ test("fallback extractor can be spezified", async () => {
     const content = await cache.get("stuff").fallback(async () => item);
     expect(content).toBe("delectus aut autem");
 });
+
+test("Syncs all on init", async () => {
+    const store1 = new Attic("store1", {
+        lifetime: 1000,
+    });
+
+    await store1.set("id1", {a: 1});
+    const store2 = new Attic("store1", {
+        lifetime: 1000,
+        syncOnInit: true,
+    });
+
+    expect(store2.itemsInMemory()).toBe(store2.itemsInPersistent());
+
+});
