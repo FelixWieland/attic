@@ -40,6 +40,11 @@ test("fallback sets item to given id", async () => {
     expect(content).toBe(items.item2);
 });
 
+test("fallback will not jump in if Item not reached end of life", async () => {
+    const content = await attic.get(ids.item2).fallback(fallbackProm(items.item1)).then((c: any) => c);
+    expect(content).toBe(items.item2);
+});
+
 test("fallback will jump in if Item reached end of life", () => {
     setTimeout(async () => {
         const content = await attic.get(ids.item2).fallback(fallbackProm(items.item1)).then((c: any) => c);
@@ -84,3 +89,4 @@ test("Syncs all on init", async () => {
     expect(store2.itemsInMemory()).toBe(store2.itemsInPersistent());
 
 });
+

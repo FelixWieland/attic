@@ -103,12 +103,13 @@ class Attic implements IAttic {
 
     private getFromMemory = (id: string) => {
         const item = this.memoryCache.retrieve(id);
-        return !item || item.reachedEndOfLife() ? this.remove(id) : item;
+        return item && item.reachedEndOfLife() ? this.remove(id) : item;
     }
 
     private getFromPersistent = (id: string) => {
         const item = this.persistentCache.retrieve(id);
-        return !item || item.reachedEndOfLife() ? this.remove(id) : this.memoryCache.restore(id, item);
+        return item && item.reachedEndOfLife()
+                    ? this.remove(id) : item ? this.memoryCache.restore(id, item) : item;
     }
 
     private makeContentPromise = (item: Item) => this.fallbackFactory(async () => item.get());
